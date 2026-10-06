@@ -1,4 +1,4 @@
 # Roadmap
-- [ ] Build coding-lab design and explorer.
-- [ ] Add safe playground and interactive learning activities.
-- [ ] Verify games, execution, and mobile layout.
+- [x] Build coding-lab design and explorer.
+- [x] Add safe playground and interactive learning activities.
+- [x] Verify games, execution, and mobile layout.
