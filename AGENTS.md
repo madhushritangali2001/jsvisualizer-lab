@@ -8,3 +8,7 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the requested learning experience on a single index route with anchor navigation, because the brief explicitly requires smooth scrolling between activities.
+- Store shared JavaScript facts and score rules in browser-safe data modules, and isolate activities into reusable React components, so educational rules stay consistent.
+- Run student code only inside a disposable worker hosted by an opaque-origin, network-blocked sandbox iframe, so experiments cannot access app storage or freeze the interface.
