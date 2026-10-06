@@ -7,7 +7,7 @@ describe('JavaScript teaching rules',()=>{
  it('null remains primitive',()=>expect(types.find(t=>t.name==='Null')?.group).toBe('Primitive'));
  it('arrays are reference values',()=>expect(types.find(t=>t.name==='Array')?.group).toBe('Reference'));
  it('functions are reference values',()=>expect(types.find(t=>t.name==='Function')?.group).toBe('Reference'));
- for(const [index,answer] of ['String','object','object','boolean','bigint'].entries())it(`challenge ${index+1} answer`,()=>expect(challenge[index].answer).toBe(answer));
+ for(const [index,answer] of ['String','object','object','boolean','bigint'].entries())it(`challenge ${index+1} answer`,()=>expect(challenge[index]?.answer).toBe(answer));
  it('90% earns master',()=>expect(scoreMessage(9,10)).toBe('JavaScript Data Type Master!'));
  it('60% earns encouragement',()=>expect(scoreMessage(6,10)).toBe('Great job! Keep exploring!'));
  it('below 60% invites another try',()=>expect(scoreMessage(5,10)).toBe('Nice try! Explore the types again and try once more.'));
