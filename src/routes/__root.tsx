@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "JavaScript Fundamentals Explorer" },
+      { title: "JS Visualizer — JavaScript Fundamentals Explorer" },
       { name: "description", content: "An interactive coding lab for beginner CSE students." },
       { property: "og:title", content: "JavaScript Fundamentals Explorer" },
       { property: "og:description", content: "Explore variables, data types, operators, coercion, hoisting and TDZ." },
@@ -91,7 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
