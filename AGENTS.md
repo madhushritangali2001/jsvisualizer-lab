@@ -12,3 +12,5 @@
 - Keep the requested learning experience on a single index route with anchor navigation, because the brief explicitly requires smooth scrolling between activities.
 - Store shared JavaScript facts and score rules in browser-safe data modules, and isolate activities into reusable React components, so educational rules stay consistent.
 - Run student code only inside a disposable worker hosted by an opaque-origin, network-blocked sandbox iframe, so experiments cannot access app storage or freeze the interface.
+- Keep topic progress in React state for the current lab session, because this browser-only experience has no accounts or persistent student records.
+- Capture console output separately from the final declared value in the sandbox worker, so learners can inspect both printed output and data type without running student code on the app thread.
