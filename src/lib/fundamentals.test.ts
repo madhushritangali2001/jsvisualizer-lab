@@ -14,7 +14,7 @@ describe('Fundamentals learning rules',()=>{
  for(const [i,answer] of ['undefined','ReferenceError','ReferenceError'].entries())it(`hoisting challenge ${i+1}`,()=>expect(hoistingQuestions[i]?.answer).toBe(answer));
  it('detective includes function',()=>expect(detectiveQuestions.find(q=>q.code==='typeof function(){}')?.answer).toBe('function'));
  it('detective includes BigInt',()=>expect(detectiveQuestions.find(q=>q.code==='typeof 100n')?.answer).toBe('bigint'));
- for(const [code,result] of [['"5" + 2','"52"'],['"5" - 2','3'],['"10" * 2','20'],['"10" / 2','5'],['true + 1','2'],['false + 1','1']])it(code,()=>expect(coercionCases.find(c=>c.code===code)?.output).toBe(result));
+ for(const [code,result] of [['"5" + 2','"52"'],['"5" - 2','3'],['"10" * 2','20'],['"10" / 2','5'],['true + 1','2'],['false + 1','1']] as const)it(code,()=>expect(coercionCases.find(c=>c.code===code)?.output).toBe(result));
  it('all assignment operators are available',()=>expect(operatorGroups.Assignment).toEqual(['=','+=','-=','*=','/=','%=','**=']));
  it('all bitwise operators are available',()=>expect(operatorGroups.Bitwise).toEqual(['&','|','^','~','<<','>>','>>>']));
  const evaluate=(code:string)=>new Function('console',`${code};return value;`)({log:()=>{}});
