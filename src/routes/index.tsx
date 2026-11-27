@@ -18,6 +18,7 @@ import {
   ShieldAlert,
   Terminal,
   Trophy,
+  RotateCcw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import labImage from "@/assets/js-lab.jpg";
@@ -629,18 +630,19 @@ function Index() {
         </LabSection>
         <section className="final-band">
           <Sparkles className="text-primary mx-auto mb-4" />
-          <h2 className="text-3xl font-semibold">Keep your curiosity running.</h2>
+          <h2 className="text-3xl font-semibold">Ready to Master JavaScript?</h2>
+          <p className="text-muted-foreground mt-3">Explore → Experiment → Predict → Learn</p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <Button size="lg" asChild>
-              <a href="#playground">
-                <Code2 />
-                Open Playground
+              <a href="#quiz">
+                <RotateCcw />
+                Play Again
               </a>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="#topics">
-                Next discovery
-                <ArrowRight />
+              <a href="#data-types">
+                <Code2 />
+                Explore Data Types
               </a>
             </Button>
           </div>
@@ -648,7 +650,7 @@ function Index() {
       </main>
       <footer className="border-t border-border">
         <div className="container-lab py-6 flex flex-wrap justify-between gap-3 text-xs text-muted-foreground">
-          <span>JavaScript Fundamentals Explorer | Built for CSE Students</span>
+          <span>JavaScript Data Types Explorer | Built for CSE Students</span>
           <span>No installation. Just curiosity.</span>
         </div>
       </footer>
