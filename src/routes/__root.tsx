@@ -81,12 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "JS Visualizer — JavaScript Fundamentals Explorer" },
       { name: "description", content: "An interactive coding lab for beginner CSE students." },
       { property: "og:title", content: "JavaScript Fundamentals Explorer" },
-      { property: "og:description", content: "Explore variables, data types, operators, coercion, hoisting and TDZ." },
+      {
+        property: "og:description",
+        content: "Explore variables, data types, operators, coercion, hoisting and TDZ.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,

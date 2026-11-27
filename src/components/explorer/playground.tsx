@@ -1,13 +1,151 @@
-import { useEffect, useRef, useState } from 'react';
-import { Play, RotateCcw, Terminal, LoaderCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { executeCode, type Execution } from '@/lib/playground';
-import { presets } from '@/lib/fundamentals';
-const initial=presets['Data Types'];
-export function Playground({expression,onExpressionUsed,onComplete}:{expression:string|null;onExpressionUsed:()=>void;onComplete?:()=>void}) {
- const [code,setCode]=useState<string>(initial);const [result,setResult]=useState<Execution|null>(null);const [busy,setBusy]=useState(false);const request=useRef(0);
- async function run(source=code){const id=++request.current;setBusy(true);const output=await executeCode(source);if(id===request.current){setResult(output);setBusy(false);onComplete?.();}}
- useEffect(()=>{if(expression){const source=`let value = ${expression};\nconsole.log(value);\nconsole.log(typeof value);`;setCode(source);setResult(null);onExpressionUsed();}},[expression,onExpressionUsed]);
- useEffect(()=>()=>{request.current++;},[]);
- return <><div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Playground presets">{Object.entries(presets).map(([name,source])=><Button key={name} size="sm" variant="outline" onClick={()=>{setCode(source);setResult(null);}}>{name}</Button>)}</div><div className="code-window grid md:grid-cols-2"><div className="min-w-0"><div className="code-head"><span className="dot"/><span className="dot"/><span className="dot"/><span className="ml-3 font-mono">playground.js</span><span className="ml-auto text-xs">JavaScript</span></div><label htmlFor="code-editor" className="sr-only">JavaScript code editor</label><textarea id="code-editor" spellCheck={false} className="editor" value={code} onChange={e=>setCode(e.target.value)} onKeyDown={e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();void run();}}}/><div className="flex items-center justify-between px-5 pb-5"><Button size="sm" onClick={()=>void run()} disabled={busy}>{busy?<LoaderCircle className="animate-spin"/>:<Play/>} Run Code</Button><Button size="icon" variant="ghost" aria-label="Reset playground" title="Reset playground" onClick={()=>{setCode(initial);setResult(null);}}><RotateCcw/></Button></div></div><div className="min-w-0 border-t md:border-t-0 md:border-l border-border"><div className="code-head"><Terminal size={14}/><span className="ml-2">OUTPUT</span><span className="ml-auto text-success">Browser sandbox</span></div><div className="output" aria-live="polite">{!result?<span className="font-mono text-muted-foreground text-sm">{busy?'Running…':'→ Ready'}</span>:<><pre className="font-mono text-code whitespace-pre-wrap break-all text-sm">{result.logs?.join('\n')}</pre>{result.error?<div className="feedback wrong"><strong>Let's try that again.</strong><p className="mt-2">{result.error}</p></div>:<dl className="rule-list mt-6"><dt>Value</dt><dd className="font-mono break-all">{result.value}</dd><dt>Data Type</dt><dd>{result.detected}</dd><dt>typeof</dt><dd className="font-mono text-primary">"{result.type}"</dd></dl>}{result.isArray&&<p className="text-xs mt-4 text-code font-mono">Array.isArray(value) → true</p>}{result.detected==='Null'&&<p className="text-xs mt-4 text-muted-foreground">Null is primitive. "object" is a historical quirk.</p>}</>}</div></div></div></>;
+import { useEffect, useRef, useState } from "react";
+import { Play, RotateCcw, Terminal, LoaderCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { executeCode, type Execution } from "@/lib/playground";
+import { presets } from "@/lib/fundamentals";
+import { logsText } from "@/lib/result-display";
+const initial = presets["Data Types"];
+export function Playground({
+  expression,
+  onExpressionUsed,
+  onComplete,
+}: {
+  expression: string | null;
+  onExpressionUsed: () => void;
+  onComplete?: () => void;
+}) {
+  const [code, setCode] = useState<string>(initial);
+  const [result, setResult] = useState<Execution | null>(null);
+  const [busy, setBusy] = useState(false);
+  const request = useRef(0);
+  async function run(source = code) {
+    const id = ++request.current;
+    setBusy(true);
+    const output = await executeCode(source);
+    if (id === request.current) {
+      setResult(output);
+      setBusy(false);
+      onComplete?.();
+    }
+  }
+  useEffect(() => {
+    if (expression) {
+      const source = `let value = ${expression};\nconsole.log(value);\nconsole.log(typeof value);`;
+      setCode(source);
+      setResult(null);
+      onExpressionUsed();
+    }
+  }, [expression, onExpressionUsed]);
+  useEffect(
+    () => () => {
+      request.current++;
+    },
+    [],
+  );
+  return (
+    <>
+      <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Playground presets">
+        {Object.entries(presets).map(([name, source]) => (
+          <Button
+            key={name}
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setCode(source);
+              setResult(null);
+            }}
+          >
+            {name}
+          </Button>
+        ))}
+      </div>
+      <div className="code-window grid md:grid-cols-2">
+        <div className="min-w-0">
+          <div className="code-head">
+            <span className="dot" />
+            <span className="dot" />
+            <span className="dot" />
+            <span className="ml-3 font-mono">playground.js</span>
+            <span className="ml-auto text-xs">JavaScript</span>
+          </div>
+          <label htmlFor="code-editor" className="sr-only">
+            JavaScript code editor
+          </label>
+          <textarea
+            id="code-editor"
+            spellCheck={false}
+            className="editor"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                void run();
+              }
+            }}
+          />
+          <div className="flex items-center justify-between px-5 pb-5">
+            <Button size="sm" onClick={() => void run()} disabled={busy}>
+              {busy ? <LoaderCircle className="animate-spin" /> : <Play />} Run Code
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="Reset playground"
+              title="Reset playground"
+              onClick={() => {
+                setCode(initial);
+                setResult(null);
+              }}
+            >
+              <RotateCcw />
+            </Button>
+          </div>
+        </div>
+        <div className="min-w-0 border-t md:border-t-0 md:border-l border-border">
+          <div className="code-head">
+            <Terminal size={14} />
+            <span className="ml-2">OUTPUT</span>
+            <span className="ml-auto text-success">Browser sandbox</span>
+          </div>
+          <div className="output" aria-live="polite">
+            {!result ? (
+              <span className="font-mono text-muted-foreground text-sm">
+                {busy ? "Running…" : "→ Ready"}
+              </span>
+            ) : (
+              <>
+                <pre className="font-mono text-code whitespace-pre-wrap break-all text-sm">
+                  {logsText(result)}
+                </pre>
+                {result.error ? (
+                  <div className="feedback wrong">
+                    <strong>Let's try that again.</strong>
+                    <p className="mt-2">{result.error}</p>
+                  </div>
+                ) : (
+                  <dl className="rule-list mt-6">
+                    <dt>Value</dt>
+                    <dd className="font-mono break-all">{result.value}</dd>
+                    <dt>Data Type</dt>
+                    <dd>{result.detected}</dd>
+                    <dt>typeof</dt>
+                    <dd className="font-mono text-primary">"{result.type}"</dd>
+                  </dl>
+                )}
+                {result.isArray && (
+                  <p className="text-xs mt-4 text-code font-mono">Array.isArray(value) → true</p>
+                )}
+                {result.detected === "Null" && (
+                  <p className="text-xs mt-4 text-muted-foreground">
+                    Null is primitive. "object" is a historical quirk.
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
