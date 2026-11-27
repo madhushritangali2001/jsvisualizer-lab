@@ -13,6 +13,7 @@ import {
   type Question,
 } from "@/lib/fundamentals";
 import { executeCode, type Execution } from "@/lib/playground";
+import { outputText } from "@/lib/result-display";
 
 export function Code({ children }: { children: React.ReactNode }) {
   return <pre className="lab-code">{children}</pre>;
@@ -48,7 +49,7 @@ function Result({ result }: { result: Execution | null }) {
   return result ? (
     <div role="status" className={`feedback ${result.error ? "wrong" : ""}`}>
       <pre className="whitespace-pre-wrap break-all font-mono">
-        {result.error ?? result.logs?.join("\n") ?? result.value}
+        {result.error ?? outputText(result)}
       </pre>
       {!result.error && (
         <p className="text-xs text-muted-foreground mt-2">

@@ -3,6 +3,7 @@ import { Play, RotateCcw, Terminal, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { executeCode, type Execution } from "@/lib/playground";
 import { presets } from "@/lib/fundamentals";
+import { logsText } from "@/lib/result-display";
 const initial = presets["Data Types"];
 export function Playground({
   expression,
@@ -115,7 +116,7 @@ export function Playground({
             ) : (
               <>
                 <pre className="font-mono text-code whitespace-pre-wrap break-all text-sm">
-                  {result.logs?.join("\n")}
+                  {logsText(result)}
                 </pre>
                 {result.error ? (
                   <div className="feedback wrong">
