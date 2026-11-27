@@ -1,5 +1,6 @@
 import { captureSuffix, lastTopLevelDeclaration } from "./code-capture";
 import { createNonce, parseSandboxMessage, type Execution } from "./sandbox-protocol";
+import { buildWorkerSource } from "./sandbox-worker";
 
 export type { Execution } from "./sandbox-protocol";
 
@@ -12,6 +13,7 @@ export function executeCode(code: string): Promise<Execution> {
     const nonce = createNonce();
     const parentOrigin = location.origin;
     let settled = false;
+    let latestLogs: string[] = [];
     const finish = (result: Execution) => {
       if (settled) return;
       settled = true;
@@ -24,13 +26,22 @@ export function executeCode(code: string): Promise<Execution> {
     const receive = (event: MessageEvent) => {
       if (event.source !== iframe.contentWindow) return;
       const parsed = parseSandboxMessage(event.data, nonce);
+      if (parsed?.kind === "progress") {
+        latestLogs = parsed.logs;
+        return;
+      }
       if (parsed?.kind === "result") finish(parsed.execution);
     };
     window.addEventListener("message", receive);
     const lastName = lastTopLevelDeclaration(code);
     const capture = captureSuffix(code);
-    const workerSource = `self.onmessage=()=>{const send=(p)=>self.postMessage(Object.assign({},p,{nonce:${JSON.stringify(nonce)}})); const logs=[];let last;let logged=false;const format=v=>{if(v===undefined)return 'undefined';if(v===null)return 'null';if(typeof v==='number'||typeof v==='bigint'||typeof v==='symbol'||typeof v==='function')return String(v)+(typeof v==='bigint'?'n':'');if(typeof v==='string')return v;const seen=new WeakSet();return JSON.stringify(v,(_,x)=>{if(typeof x==='bigint')return String(x)+'n';if(typeof x==='number'&&!Number.isFinite(x))return String(x);if(x&&typeof x==='object'){if(seen.has(x))return '[Circular]';seen.add(x);}return x;});};const console={log:(...args)=>{last=args[0];logged=true;if(logs.length<100)logs.push(args.map(format).join(' ').slice(0,5000));}};console.info=console.warn=console.error=console.log;try{const captured=new Function('console','"use strict";'+${JSON.stringify(code)}+${JSON.stringify(capture)})(console);const value=${lastName ? "captured" : "logged?last:captured"};const type=typeof value;const array=Array.isArray(value);send({value:String(type==='string'?JSON.stringify(value):format(value)).slice(0,5000),type,detected:value===null?'Null':array?'Array':type.charAt(0).toUpperCase()+type.slice(1),isArray:array,logs});}catch(e){send({value:'',type:'error',detected:'',isArray:false,logs,error:e.name+': '+e.message});}};`;
-    iframe.srcdoc = `<!doctype html><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; connect-src 'none'"><script>const url=URL.createObjectURL(new Blob([${JSON.stringify(workerSource).replace(/</g, "\\u003c")}],{type:'text/javascript'}));const w=new Worker(url);URL.revokeObjectURL(url);onmessage=()=>w.terminate();w.onmessage=e=>{parent.postMessage(e.data,${JSON.stringify(parentOrigin)});w.terminate()};w.onerror=()=>{parent.postMessage({value:'',type:'error',detected:'',isArray:false,error:'Could not run this code.',nonce:${JSON.stringify(nonce)}},${JSON.stringify(parentOrigin)});w.terminate()};w.postMessage(${JSON.stringify(nonce)});\u003c/script>`;
+    const workerSource = buildWorkerSource({
+      code,
+      capture,
+      useCapturedValue: lastName !== null,
+      nonce,
+    });
+    iframe.srcdoc = `<!doctype html><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob:; connect-src 'none'"><script>const url=URL.createObjectURL(new Blob([${JSON.stringify(workerSource).replace(/</g, "\\u003c")}],{type:'text/javascript'}));const w=new Worker(url);URL.revokeObjectURL(url);onmessage=()=>w.terminate();w.onmessage=e=>{parent.postMessage(e.data,${JSON.stringify(parentOrigin)});if(e.data&&e.data.kind==='result')w.terminate()};w.onerror=()=>{parent.postMessage({value:'',type:'error',detected:'',isArray:false,error:'Could not run this code.',nonce:${JSON.stringify(nonce)}},${JSON.stringify(parentOrigin)});w.terminate()};w.postMessage(${JSON.stringify(nonce)});\u003c/script>`;
     const timer = setTimeout(
       () =>
         finish({
@@ -38,6 +49,7 @@ export function executeCode(code: string): Promise<Execution> {
           type: "error",
           detected: "",
           isArray: false,
+          logs: latestLogs,
           error: "Execution stopped after 1.5 seconds. Check for an endless loop.",
         }),
       1500,
